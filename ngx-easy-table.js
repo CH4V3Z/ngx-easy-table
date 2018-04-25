@@ -329,13 +329,13 @@ BaseComponent.decorators = [
                 template: `
     <div class="ngx-container">
       <div class="ngx-columns">
-        <div class="ngx-column ngx-col-4 ngx-col-mr-auto"></div>
         <div class="ngx-column ngx-col-3">
           <global-search
             *ngIf="config.globalSearchEnabled"
             (globalUpdate)="onGlobalSearch($event)">
           </global-search>
         </div>
+        <div class="ngx-column ngx-col-4 ngx-col-mr-auto"></div>
       </div>
       <div class="ngx-columns">
         <table class="ngx-table ngx-table-striped ngx-table-hover">
