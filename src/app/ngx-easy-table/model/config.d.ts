@@ -17,3 +17,4 @@ export interface Config {
     groupRows: boolean;
     paginationRangeEnabled: boolean;
 }
+// nada mas probandio
