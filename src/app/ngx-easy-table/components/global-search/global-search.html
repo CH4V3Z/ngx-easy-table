@@ -1,0 +1,8 @@
+<label class="form-label ngx-float-right" for="search">
+  <input type="text"
+         id="search"
+         class="ngx-table__global-search ngx-form-input ngx-input-sm"
+         #input
+         (input)="globalUpdate.emit({value: input.value})"
+         placeholder="Search"/>
+</label>

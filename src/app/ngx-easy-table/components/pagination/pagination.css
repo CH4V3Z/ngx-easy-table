@@ -1,0 +1,23 @@
+:host /deep/ pagination-controls > pagination-template > ul > li {
+  border: 1px solid #f0f0f0;
+}
+.ngx-btn {
+  color: #4f596c;
+  border: 1px solid #f0f0f0;
+}
+.ngx-range-dropdown {
+  margin-top: 8px;
+  margin-right: 2px;
+}
+.ngx-range-dropdown-button {
+  padding: 4px;
+}
+.ngx-menu {
+  min-width: 55px;
+}
+@media screen and (max-width: 480px) {
+  .pagination-mobile {
+    margin-right: auto;
+    margin-left: auto;
+  }
+}

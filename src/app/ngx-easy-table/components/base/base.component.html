@@ -1,0 +1,145 @@
+<div class="ngx-container">
+  <div class="ngx-columns">
+    <div class="ngx-column ngx-col-4 ngx-col-mr-auto"></div>
+    <div class="ngx-column ngx-col-3">
+      <global-search
+        *ngIf="config.globalSearchEnabled"
+        (globalUpdate)="onGlobalSearch($event)">
+      </global-search>
+    </div>
+  </div>
+  <div class="ngx-columns">
+    <table class="ngx-table ngx-table-striped ngx-table-hover">
+      <thead>
+      <tr class="ngx-table__header" *ngIf="config.headerEnabled">
+        <ng-container *ngFor="let column of columns">
+          <th class="ngx-table__header-cell"
+              (click)="orderBy(column['key'])">
+            <div class="ngx-d-inline">{{ column['title'] }}</div>
+            <span *ngIf="resource.order[column['key']]==='asc' "
+                  [style.display]="config.orderEnabled?'':'none' "
+                  class="ngx-icon ngx-icon-arrow-up">
+            </span>
+            <span *ngIf="resource.order[column['key']]==='desc' "
+                  [style.display]="config.orderEnabled?'':'none' "
+                  class="ngx-icon ngx-icon-arrow-down">
+            </span>
+          </th>
+        </ng-container>
+        <th *ngIf="config.additionalActions || config.detailsTemplate"
+            class="ngx-table__header-cell-additional-actions">
+          <div class="ngx-dropdown ngx-active ngx-dropdown-right"
+               *ngIf="config.additionalActions"
+               [class.ngx-active]="menuActive">
+            <a class="ngx-btn ngx-btn-link" (click)="menuActive = !menuActive">
+              <span class="ngx-icon ngx-icon-menu"></span>
+            </a>
+            <ul class="ngx-menu ngx-table__table-menu">
+              <li class="ngx-menu-item">
+                <csv-export *ngIf="config.exportEnabled"></csv-export>
+              </li>
+            </ul>
+          </div>
+        </th>
+      </tr>
+      <tr *ngIf="config.searchEnabled"
+          class="ngx-table__sortHeader">
+        <ng-container *ngFor="let column of columns">
+          <th>
+            <table-header (update)="onSearch($event)" [column]="column"></table-header>
+          </th>
+        </ng-container>
+        <th *ngIf="config.additionalActions || config.detailsTemplate"></th>
+      </tr>
+      </thead>
+      <tbody *ngIf="data && !config.isLoading">
+      <ng-container *ngIf="rowTemplate">
+        <tr *ngFor="let row of data | search : term | global : globalSearchTerm | paginate: { itemsPerPage: limit, currentPage: page, totalItems: count, id: id };
+              let rowIndex = index"
+            (click)="clickedCell($event, row, '', '', rowIndex)"
+            [class.ngx-table__table-row--selected]="rowIndex == selectedRow && !config.selectCell">
+          <ng-container [ngTemplateOutlet]="rowTemplate"
+                        [ngTemplateOutletContext]="{ $implicit: row }">
+          </ng-container>
+        </tr>
+      </ng-container>
+      <ng-container *ngIf="!rowTemplate && !config.groupRows">
+        <ng-container
+          *ngFor="let row of data | search : term | global : globalSearchTerm | paginate: { itemsPerPage: limit, currentPage: page, totalItems: count, id: id };
+                  let rowIndex = index"
+          [class.ngx-table__table-row--selected]="rowIndex == selectedRow && !config.selectCell">
+          <tr>
+            <ng-container *ngFor="let column of columns; let colIndex = index">
+              <td (click)="clickedCell($event, row, column['key'], colIndex, rowIndex)"
+                  [class.ngx-table__table-col--selected]="colIndex == selectedCol && !config.selectCell"
+                  [class.ngx-table__table-cell--selected]="colIndex == selectedCol && rowIndex == selectedRow && !config.selectCol && !config.selectRow"
+              >
+                <div>{{ row[column['key']] }}</div>
+              </td>
+            </ng-container>
+            <td *ngIf="config.additionalActions || config.detailsTemplate">
+              <span class="ngx-icon ngx-c-hand"
+                    [class.ngx-icon-arrow-down]="selectedDetailsTemplateRowId === rowIndex"
+                    [class.ngx-icon-arrow-right]="selectedDetailsTemplateRowId !== rowIndex"
+                    (click)="selectRowId(rowIndex)">
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="config.detailsTemplate && selectedDetailsTemplateRowId === rowIndex">
+            <td [attr.colspan]="columns.length + 1">
+              <ng-container
+                [ngTemplateOutlet]="detailsTemplate"
+                [ngTemplateOutletContext]="{ $implicit: row }">
+              </ng-container>
+            </td>
+          </tr>
+        </ng-container>
+      </ng-container>
+      <ng-container *ngIf="!rowTemplate && config.groupRows">
+        <ng-container
+          *ngFor="let group of grouped; let rowIndex = index">
+          <tr>
+            <td [attr.colspan]="columns.length">
+              <div>{{group[0][groupRowsBy]}} ({{group.length}})</div>
+            </td>
+            <td>
+              <span class="ngx-icon ngx-c-hand"
+                    [class.ngx-icon-arrow-down]="selectedDetailsTemplateRowId === rowIndex"
+                    [class.ngx-icon-arrow-right]="selectedDetailsTemplateRowId !== rowIndex"
+                    (click)="selectRowId(rowIndex)">
+              </span>
+            </td>
+          </tr>
+          <ng-container *ngIf="selectedDetailsTemplateRowId === rowIndex">
+            <tr *ngFor="let row of group">
+              <td *ngFor="let column of columns">
+                {{row[column['key']]}}
+                <!-- TODO allow users to add groupRowsTemplateRef -->
+              </td>
+              <td></td>
+            </tr>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+      </tbody>
+      <tbody *ngIf="!data">
+      <tr class="ngx-table__body-empty">
+        <td>No results</td>
+      </tr>
+      </tbody>
+      <tbody *ngIf="config.isLoading">
+      <tr class="ngx-table__body-loading">
+        <td>
+          <div class="ngx-table__table-loader"></div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <pagination
+    *ngIf="config.paginationEnabled"
+    [id]="id"
+    [pagination]="pagination"
+    (updateRange)="onPagination($event)">
+  </pagination>
+</div>

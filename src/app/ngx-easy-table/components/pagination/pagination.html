@@ -1,0 +1,30 @@
+<div class="ngx-columns">
+  <div class="ngx-col-mr-auto pagination-mobile">
+    <pagination-controls
+      [id]="id"
+      [maxSize]="5"
+      [previousLabel]="''"
+      [nextLabel]="''"
+      (pageChange)="onPageChange($event)">
+    </pagination-controls>
+  </div>
+  <div class="pagination-mobile" *ngIf="config.paginationRangeEnabled">
+    <div class="ngx-dropdown ngx-range-dropdown ngx-float-right"
+         [class.ngx-active]="showRange"
+         id="rowAmount">
+      <div class="ngx-btn-group">
+        <div class="ngx-btn ngx-range-dropdown-button"
+              (click)="showRange = !showRange">
+          {{limit}} <i class="ngx-icon ngx-icon-arrow-down"></i>
+        </div>
+        <ul class="ngx-menu">
+          <li class="ngx-c-hand ngx-range-dropdown-button"
+              (click)="changeLimit(limit)"
+              *ngFor="let limit of ranges">
+            <span>{{limit}}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
